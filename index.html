@@ -528,7 +528,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
       <div class="mood-label">Don't Care</div>
       <div class="mood-count">Any length</div>
     </div>
-    <div class="mood-tile everything" onclick="document.getElementById('mood-results-bar').classList.remove('visible');document.querySelector('.tab-bar').style.display='';show('home');renderGrid()">
+    <div class="mood-tile everything" onclick="document.getElementById('mood-results-bar').classList.remove('visible');document.getElementById('home-tab-bar').style.display='';show('home');renderGrid()">
       <div class="mood-emoji">📖</div>
       <div class="mood-label">Show me everything — I'll decide</div>
     </div>
@@ -564,7 +564,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
     <span class="mrb-label" id="mrb-label"></span>
     <button class="mrb-explore" onclick="showWildcard()">🃏 Explore Web</button>
   </div>
-  <div class="tab-bar">
+  <div class="tab-bar" id="home-tab-bar">
     <button class="tab-bar-btn active" onclick="setTab('all',this)">🍽 All</button>
     <button class="tab-bar-btn" onclick="setTab('favorites',this)">⭐ Favorites</button>
     <button class="tab-bar-btn" onclick="setTab('explore',this)">🔍 Explore</button>
@@ -1179,7 +1179,7 @@ function applyTimeFilter(recipes) {
 function renderMoodResults(proteinFn, label) {
   show('home');
   // Hide the normal tab bar, show mood results bar
-  document.querySelector('.tab-bar').style.display = 'none';
+  document.getElementById('home-tab-bar').style.display = 'none';
   showMoodResultsBar(label || '');
   const grid = document.getElementById('recipe-grid');
   grid.innerHTML = '';
@@ -1409,7 +1409,7 @@ function goHome() { show('mood'); enterMood(); }
 
 function goBackToMood() {
   document.getElementById('mood-results-bar').classList.remove('visible');
-  document.querySelector('.tab-bar').style.display = '';
+  document.getElementById('home-tab-bar').style.display = '';
   show('mood');
   enterMood();
 }
