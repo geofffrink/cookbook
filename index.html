@@ -420,6 +420,31 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 }
 .mood-tile.time-tile .mood-emoji { font-size:26px; }
 .mood-tile.time-tile .mood-label { font-size:11px; }
+
+/* ── MOOD RESULTS BAR ── */
+.mood-results-bar {
+  display:none; flex-shrink:0;
+  background:var(--dark-brown); padding:10px 14px;
+  align-items:center; justify-content:space-between; gap:10px;
+}
+.mood-results-bar.visible { display:flex; }
+.mrb-back {
+  background:rgba(255,255,255,0.12); border:none; border-radius:50px;
+  color:white; font-family:var(--font-body); font-size:13px;
+  font-weight:500; padding:8px 14px; cursor:pointer; white-space:nowrap;
+  display:flex; align-items:center; gap:5px;
+}
+.mrb-label {
+  font-size:12px; color:rgba(255,255,255,0.5); flex:1; text-align:center;
+  font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mrb-explore {
+  background:var(--gold); border:none; border-radius:50px;
+  color:var(--dark-brown); font-family:var(--font-body); font-size:12px;
+  font-weight:700; padding:8px 14px; cursor:pointer; white-space:nowrap;
+  display:flex; align-items:center; gap:5px;
+}
+.mrb-explore:active { opacity:0.85; }
 </style>
 </head>
 <body>
@@ -503,7 +528,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
       <div class="mood-label">Don't Care</div>
       <div class="mood-count">Any length</div>
     </div>
-    <div class="mood-tile everything" onclick="show('home');renderGrid()">
+    <div class="mood-tile everything" onclick="document.getElementById('mood-results-bar').classList.remove('visible');document.querySelector('.tab-bar').style.display='';show('home');renderGrid()">
       <div class="mood-emoji">📖</div>
       <div class="mood-label">Show me everything — I'll decide</div>
     </div>
@@ -533,6 +558,11 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
     <div class="eyebrow">A Personal Cookbook</div>
     <h1 class="home-title">The Flavor<br><em>Terrorists</em></h1>
     <div class="home-meta"><span id="recipe-count-label">13 recipes</span><span></span>Geoff &amp; Emily</div>
+  </div>
+  <div class="mood-results-bar" id="mood-results-bar">
+    <button class="mrb-back" onclick="goBackToMood()">← Mood</button>
+    <span class="mrb-label" id="mrb-label"></span>
+    <button class="mrb-explore" onclick="showWildcard()">🃏 Explore Web</button>
   </div>
   <div class="tab-bar">
     <button class="tab-bar-btn active" onclick="setTab('all',this)">🍽 All</button>
@@ -1139,8 +1169,11 @@ function applyTimeFilter(recipes) {
   });
 }
 
-function renderMoodResults(proteinFn) {
+function renderMoodResults(proteinFn, label) {
   show('home');
+  // Hide the normal tab bar, show mood results bar
+  document.querySelector('.tab-bar').style.display = 'none';
+  showMoodResultsBar(label || '');
   const grid = document.getElementById('recipe-grid');
   grid.innerHTML = '';
   let filtered = RECIPES.filter(proteinFn).map(r => ({...r, cooks: getCooks(r.id)}));
@@ -1175,8 +1208,14 @@ function filterMood(type) {
     pasta:   r => r.category === 'Pasta',
     veggie:  r => r.category === 'Vegetarian' || r.category === 'Sides',
   };
+  const labels = {
+    steak:'🥩 Steak', chicken:'🍗 Chicken', pork:'🐷 Pork',
+    turkey:'🦃 Turkey', seafood:'🐟 Fish & Seafood',
+    pasta:'🍝 Pasta', veggie:'🥗 Veggie & Sides'
+  };
+  const timeLabel = selectedTime === 'quick' ? ' · ⚡ Quick' : selectedTime === 'medium' ? ' · 🕐 Medium' : '';
   const fn = filters[type];
-  if (fn) renderMoodResults(fn);
+  if (fn) renderMoodResults(fn, (labels[type]||type) + timeLabel);
 }
 
 function surpriseMe() {
@@ -1360,6 +1399,20 @@ function adjustCook(delta) {
 }
 
 function goHome() { show('mood'); enterMood(); }
+
+function goBackToMood() {
+  document.getElementById('mood-results-bar').classList.remove('visible');
+  document.querySelector('.tab-bar').style.display = '';
+  show('mood');
+  enterMood();
+}
+
+function showMoodResultsBar(label) {
+  const bar = document.getElementById('mood-results-bar');
+  const lbl = document.getElementById('mrb-label');
+  lbl.textContent = label;
+  bar.classList.add('visible');
+}
 
 function startCooking() {
   if (!current?.steps?.length) { alert("No cooking steps yet for this recipe — coming soon!"); return; }
