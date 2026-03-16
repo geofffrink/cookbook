@@ -369,7 +369,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 }
 .mood-tile:active { transform:scale(0.95); background:rgba(255,255,255,0.13); }
 .mood-tile.special { background:rgba(193,59,24,0.25); border-color:rgba(193,59,24,0.5); }
-.mood-tile.wildcard { background:rgba(201,150,42,0.2); border-color:rgba(201,150,42,0.45); }
+
 .mood-tile.everything { grid-column:1/-1; flex-direction:row; gap:10px; padding:12px 20px; background:rgba(255,255,255,0.05); }
 .mood-emoji { font-size:26px; line-height:1; }
 .mood-tile.everything .mood-emoji { font-size:22px; }
@@ -377,41 +377,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 .mood-tile.everything .mood-label { font-size:13px; }
 .mood-count { font-size:9px; color:rgba(255,255,255,0.4); }
 
-/* ── WILDCARD MODAL ── */
-.wildcard-modal {
-  position:fixed; inset:0; background:rgba(0,0,0,0.75);
-  display:flex; align-items:flex-end; justify-content:center;
-  z-index:200; padding:0;
-}
-.wildcard-modal.hidden { display:none !important; }
-.wildcard-sheet {
-  background:var(--warm-white); border-radius:24px 24px 0 0;
-  width:100%; max-width:600px; padding:28px 24px 36px;
-  display:flex; flex-direction:column; gap:16px;
-}
-.wc-handle { width:40px; height:4px; background:#D4C8BC; border-radius:2px; margin:0 auto 8px; }
-.wc-tag { font-size:9px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--gold); }
-.wc-title { font-family:var(--font-display); font-size:24px; font-weight:900; color:var(--charcoal); line-height:1.15; }
-.wc-source { font-size:12px; color:#8A8070; }
-.wc-desc { font-size:14px; color:#504840; line-height:1.6; }
-.wc-img { width:100%; height:180px; object-fit:cover; border-radius:14px; display:block; }
-.wc-actions { display:flex; gap:10px; }
-.wc-view-btn {
-  flex:2; padding:15px; background:var(--dark-brown); color:white;
-  border:none; border-radius:12px; font-family:var(--font-body);
-  font-size:14px; font-weight:600; cursor:pointer; text-align:center; text-decoration:none;
-  display:flex; align-items:center; justify-content:center; gap:6px;
-}
-.wc-next-btn {
-  flex:1; padding:15px; background:rgba(193,59,24,0.1); color:var(--rust);
-  border:1.5px solid rgba(193,59,24,0.25); border-radius:12px;
-  font-family:var(--font-body); font-size:14px; font-weight:600; cursor:pointer;
-}
-.wc-close-btn {
-  padding:14px; background:none; color:#9A9080; border:1.5px solid var(--border);
-  border-radius:12px; font-family:var(--font-body); font-size:13px;
-  font-weight:500; cursor:pointer; text-align:center;
-}
+
 
 
 /* ── MOOD RESULTS BAR ── */
@@ -438,6 +404,37 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
   display:flex; align-items:center; gap:5px;
 }
 .mrb-explore:active { opacity:0.85; }
+
+/* ── SUGGESTIONS TAB ── */
+.suggestions-grid {
+  display:flex; flex-direction:column; gap:14px; padding:16px 0 24px;
+}
+.suggestion-card {
+  background:white; border-radius:16px; overflow:hidden;
+  box-shadow:var(--card-shadow); display:flex; gap:0;
+  flex-direction:column; cursor:pointer; transition:transform 0.18s;
+  -webkit-user-select:none;
+}
+.suggestion-card:active { transform:scale(0.98); }
+.suggestion-img {
+  width:100%; height:180px; object-fit:cover; display:block;
+  background:#E8E0D4;
+}
+.suggestion-body { padding:14px 16px 16px; }
+.suggestion-cuisine { font-size:9px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--rust); margin-bottom:4px; }
+.suggestion-title { font-family:var(--font-display); font-size:17px; font-weight:700; color:var(--charcoal); line-height:1.2; margin-bottom:6px; }
+.suggestion-desc { font-size:13px; color:#7A7060; line-height:1.55; margin-bottom:12px; }
+.suggestion-meta { display:flex; align-items:center; justify-content:space-between; }
+.suggestion-rating { font-size:12px; font-weight:600; color:var(--gold); }
+.suggestion-link {
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--dark-brown); color:white;
+  font-family:var(--font-body); font-size:12px; font-weight:600;
+  padding:8px 14px; border-radius:50px; text-decoration:none;
+  transition:background 0.2s;
+}
+.suggestion-link:active { background:var(--rust); }
+.suggestions-header { font-size:11px; color:#A09880; text-align:center; padding:8px 0 4px; letter-spacing:0.5px; }
 </style>
 </head>
 <body>
@@ -499,33 +496,12 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
       <div class="mood-label">Surprise Me</div>
       <div class="mood-count">Random pick</div>
     </div>
-    <div class="mood-tile wildcard" onclick="showWildcard()">
-      <div class="mood-emoji">🃏</div>
-      <div class="mood-label">Wildcard</div>
-      <div class="mood-count">Something new</div>
-    </div>
+
 
     <div class="mood-tile everything" onclick="document.getElementById('mood-results-bar').classList.remove('visible');document.getElementById('home-tab-bar').style.display='';show('home');renderGrid()">
       <div class="mood-emoji">📖</div>
       <div class="mood-label">Show me everything — I'll decide</div>
     </div>
-  </div>
-</div>
-
-<!-- WILDCARD MODAL -->
-<div id="wildcard-modal" class="wildcard-modal hidden">
-  <div class="wildcard-sheet">
-    <div class="wc-handle"></div>
-    <div class="wc-tag" id="wc-tag"></div>
-    <div class="wc-title" id="wc-title"></div>
-    <div class="wc-source" id="wc-source"></div>
-    <img class="wc-img" id="wc-img" src="" alt="">
-    <div class="wc-desc" id="wc-desc"></div>
-    <div class="wc-actions">
-      <a class="wc-view-btn" id="wc-link" href="" target="_blank">🔗 View Full Recipe</a>
-      <button class="wc-next-btn" onclick="showWildcard()">Next →</button>
-    </div>
-    <button class="wc-close-btn" onclick="closeWildcard()">Close</button>
   </div>
 </div>
 
@@ -539,12 +515,11 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
   <div class="mood-results-bar" id="mood-results-bar">
     <button class="mrb-back" onclick="goBackToMood()">← Mood</button>
     <span class="mrb-label" id="mrb-label"></span>
-    <button class="mrb-explore" onclick="showWildcard()">🃏 Explore Web</button>
   </div>
   <div class="tab-bar" id="home-tab-bar">
     <button class="tab-bar-btn active" onclick="setTab('all',this)">🍽 All</button>
     <button class="tab-bar-btn" onclick="setTab('favorites',this)">⭐ Favorites</button>
-    <button class="tab-bar-btn" onclick="setTab('explore',this)">🔍 Explore</button>
+    <button class="tab-bar-btn" onclick="setTab('suggestions',this)">💡 Suggestions</button>
   </div>
   <div class="recipe-scroll"><div class="recipe-grid" id="recipe-grid"></div></div>
 </div>
@@ -1089,30 +1064,64 @@ function setCooks(id, n) {
   localStorage.setItem('cooks_'+id, n);
 }
 
-const WILDCARDS = [
-  {title:"Birria Tacos",tag:"Mexican · Beef",desc:"Slow-braised beef in a rich chile broth, served in crispy cheese-fried tortillas with consommé for dipping. A serious weekend project worth every minute.",url:"https://www.seriouseats.com/birria-tacos-recipe",img:"https://images.unsplash.com/photo-1624300629298-e9de39c13be5?w=800&q=80"},
-  {title:"Thai Basil Chicken (Pad Krapow Gai)",tag:"Thai · Chicken",desc:"A 15-minute weeknight warrior — ground chicken stir-fried with holy basil, fish sauce, and oyster sauce, served over rice with a crispy fried egg.",url:"https://www.seriouseats.com/pad-krapow-gai-recipe",img:"https://images.unsplash.com/photo-1562802378-063ec186a863?w=800&q=80"},
-  {title:"Shakshuka",tag:"Middle Eastern · Eggs",desc:"Eggs poached in a spiced tomato and pepper sauce. Dead simple, deeply satisfying, and infinitely riffable with feta, chorizo, or harissa.",url:"https://www.seriouseats.com/shakshuka-recipe",img:"https://images.unsplash.com/photo-1590412200988-a436970781fa?w=800&q=80"},
-  {title:"Korean Bulgogi Bowls",tag:"Korean · Beef",desc:"Thinly sliced beef marinated in soy, sesame, garlic and pear, seared fast and served over steamed rice with kimchi and pickled cucumbers.",url:"https://www.koreanbapsang.com/bulgogi-korean-bbq-beef/",img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&q=80"},
-  {title:"Miso Butter Salmon",tag:"Japanese · Seafood",desc:"Salmon glazed with white miso, butter, and mirin — caramelizes into something extraordinary in under 20 minutes. Serve over soba or rice.",url:"https://www.foodnetwork.com/recipes/miso-salmon",img:"https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80"},
-  {title:"Creamy Tuscan White Bean Soup",tag:"Italian · Vegetarian",desc:"Cannellini beans simmered with sun-dried tomatoes, spinach, parmesan, and rosemary into a silky, hearty soup that tastes like it cooked all day.",url:"https://www.halfbakedharvest.com/tuscan-white-bean-soup/",img:"https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80"},
-  {title:"Carne Asada Street Tacos",tag:"Mexican · Beef",desc:"Flank steak marinated in citrus, garlic, and cumin, charred over high heat and sliced thin. The best tacos you'll make at home.",url:"https://www.isabeleats.com/carne-asada/",img:"https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80"},
-  {title:"Honey Garlic Shrimp",tag:"American · Seafood",desc:"Plump shrimp sautéed in a sticky honey-garlic-butter sauce in under 15 minutes. Serve over rice or pasta — both are incredible.",url:"https://www.saltandlavender.com/honey-garlic-shrimp/",img:"https://images.unsplash.com/photo-1559847844-5315695dadae?w=800&q=80"},
-  {title:"Green Chile Chicken Enchiladas",tag:"Mexican · Chicken",desc:"Shredded chicken rolled in corn tortillas with roasted green chiles and smothered in a tangy tomatillo cream sauce and melted jack cheese.",url:"https://www.halfbakedharvest.com/green-chile-chicken-enchiladas/",img:"https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=800&q=80"},
-  {title:"Sheet Pan Sausage & Vegetables",tag:"American · Pork",desc:"Italian sausage, bell peppers, zucchini, and onions roasted on one pan with herbs and olive oil. 10 minutes of prep, zero cleanup.",url:"https://www.wellplated.com/sheet-pan-sausage-and-vegetables/",img:"https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&q=80"},
-  {title:"Spicy Peanut Noodles",tag:"Asian · Vegetarian",desc:"Cold sesame noodles with a punchy peanut-chili sauce, cucumber, scallions and a drizzle of chili oil. Ready in 20 minutes, eaten in 5.",url:"https://www.bonappetit.com/recipe/cold-sesame-noodles",img:"https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=800&q=80"},
-  {title:"Marry Me Chicken",tag:"Italian · Chicken",desc:"Seared chicken breasts simmered in a sun-dried tomato cream sauce with parmesan and fresh herbs. So good it supposedly inspires proposals.",url:"https://www.delish.com/cooking/recipe-ideas/a25648042/marry-me-chicken-recipe/",img:"https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=800&q=80"},
-  {title:"Smoked Brisket",tag:"BBQ · Beef",desc:"Low and slow over oak or hickory for 12+ hours until fall-apart tender with a thick peppery bark. The pinnacle of backyard cooking.",url:"https://www.seriouseats.com/texas-style-smoked-beef-brisket",img:"https://images.unsplash.com/photo-1544025162-d76538f10f30?w=800&q=80"},
-  {title:"Lobster Bisque",tag:"French · Seafood",desc:"A rich, velvety bisque made from scratch with lobster shells, cream, cognac, and tarragon. Restaurant-quality in your own kitchen.",url:"https://www.spendwithpennies.com/lobster-bisque/",img:"https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=800&q=80"},
-  {title:"Lamb Kofta with Tzatziki",tag:"Middle Eastern · Lamb",desc:"Spiced ground lamb on skewers, grilled until charred outside and juicy within. Served with cool tzatziki and warm flatbread.",url:"https://www.recipetineats.com/kofta-kebabs/",img:"https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&q=80"},
-  {title:"Chicken Tikka Masala",tag:"Indian · Chicken",desc:"Charred chicken pieces bathed in a velvety tomato-cream sauce fragrant with garam masala, ginger, and fenugreek. A true crowd-pleaser.",url:"https://www.seriouseats.com/chicken-tikka-masala-recipe",img:"https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80"},
-  {title:"French Onion Soup",tag:"French · Beef",desc:"Deeply caramelized onions in a rich beef broth, topped with a crouton and blanketed in melted Gruyère. Pure cold-weather comfort.",url:"https://www.seriouseats.com/french-onion-soup-recipe",img:"https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=800&q=80"},
-  {title:"Carnitas",tag:"Mexican · Pork",desc:"Pork shoulder slow-cooked in lard with orange and spices until meltingly tender, then crisped under the broiler. The ultimate taco filling.",url:"https://www.seriouseats.com/the-best-slow-cooked-carnitas-recipe",img:"https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=800&q=80"},
-  {title:"Miso Ramen",tag:"Japanese · Pork",desc:"A rich miso-based broth with chashu pork belly, soft-boiled eggs, noodles, nori, and corn. Weekend worthy and deeply satisfying.",url:"https://www.seriouseats.com/miso-ramen-recipe",img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&q=80"},
-  {title:"Peking-Style Duck Breast",tag:"Chinese · Duck",desc:"Duck breast scored and roasted with a sweet hoisin glaze until the skin crisps like lacquer. Serve with mandarin pancakes and scallions.",url:"https://www.seriouseats.com/peking-duck-recipe",img:"https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&q=80"},
+const SUGGESTIONS = [
+  {title:"Birria Tacos",cuisine:"Mexican · Beef",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Slow-braised beef in a rich chile broth, served in crispy cheese-fried tortillas with consommé for dipping. A serious weekend project worth every minute.",url:"https://www.seriouseats.com/birria-tacos-recipe",img:"https://images.unsplash.com/photo-1624300629298-e9de39c13be5?w=800&q=80"},
+  {title:"Thai Basil Chicken (Pad Krapow Gai)",cuisine:"Thai · Chicken",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"A 15-minute weeknight warrior — ground chicken stir-fried with holy basil, fish sauce, and oyster sauce, served over rice with a crispy fried egg.",url:"https://www.seriouseats.com/pad-krapow-gai-recipe",img:"https://images.unsplash.com/photo-1562802378-063ec186a863?w=800&q=80"},
+  {title:"Marry Me Chicken",cuisine:"Italian · Chicken",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Seared chicken breasts simmered in a sun-dried tomato cream sauce with parmesan and fresh herbs. So good it supposedly inspires proposals.",url:"https://www.delish.com/cooking/recipe-ideas/a25648042/marry-me-chicken-recipe/",img:"https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=800&q=80"},
+  {title:"Korean Bulgogi Bowls",cuisine:"Korean · Beef",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Thinly sliced beef marinated in soy, sesame, garlic and pear, seared fast and served over steamed rice with kimchi and pickled cucumbers.",url:"https://www.koreanbapsang.com/bulgogi-korean-bbq-beef/",img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&q=80"},
+  {title:"Miso Butter Salmon",cuisine:"Japanese · Seafood",rating:"⭐⭐⭐⭐⭐ 4.8",desc:"Salmon glazed with white miso, butter, and mirin — caramelizes into something extraordinary in under 20 minutes. Serve over soba or rice.",url:"https://www.foodnetwork.com/recipes/miso-salmon",img:"https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80"},
+  {title:"Carne Asada Street Tacos",cuisine:"Mexican · Beef",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Flank steak marinated in citrus, garlic, and cumin, charred over high heat and sliced thin. The best tacos you can make at home.",url:"https://www.isabeleats.com/carne-asada/",img:"https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&q=80"},
+  {title:"Green Chile Chicken Enchiladas",cuisine:"Mexican · Chicken",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Shredded chicken rolled in corn tortillas with roasted green chiles and smothered in a tangy tomatillo cream sauce and melted jack cheese.",url:"https://www.halfbakedharvest.com/green-chile-chicken-enchiladas/",img:"https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=800&q=80"},
+  {title:"Spicy Peanut Noodles",cuisine:"Asian · Vegetarian",rating:"⭐⭐⭐⭐⭐ 4.8",desc:"Cold sesame noodles with a punchy peanut-chili sauce, cucumber, scallions and a drizzle of chili oil. Ready in 20 minutes, eaten in 5.",url:"https://www.bonappetit.com/recipe/cold-sesame-noodles",img:"https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=800&q=80"},
+  {title:"Chicken Tikka Masala",cuisine:"Indian · Chicken",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Charred chicken pieces bathed in a velvety tomato-cream sauce fragrant with garam masala, ginger, and fenugreek. A true crowd-pleaser.",url:"https://www.seriouseats.com/chicken-tikka-masala-recipe",img:"https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80"},
+  {title:"French Onion Soup",cuisine:"French · Beef",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Deeply caramelized onions in a rich beef broth, topped with a crouton and blanketed in melted Gruyère. Pure cold-weather comfort.",url:"https://www.seriouseats.com/french-onion-soup-recipe",img:"https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=800&q=80"},
+  {title:"Carnitas",cuisine:"Mexican · Pork",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Pork shoulder slow-cooked until meltingly tender, then crisped under the broiler. The ultimate taco filling — worth every minute.",url:"https://www.seriouseats.com/the-best-slow-cooked-carnitas-recipe",img:"https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=800&q=80"},
+  {title:"Shakshuka",cuisine:"Middle Eastern · Eggs",rating:"⭐⭐⭐⭐⭐ 4.8",desc:"Eggs poached in a spiced tomato and pepper sauce. Dead simple, deeply satisfying, and infinitely riffable with feta, chorizo, or harissa.",url:"https://www.seriouseats.com/shakshuka-recipe",img:"https://images.unsplash.com/photo-1590412200988-a436970781fa?w=800&q=80"},
+  {title:"Honey Garlic Shrimp",cuisine:"American · Seafood",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Plump shrimp sautéed in a sticky honey-garlic-butter sauce in under 15 minutes. Serve over rice or pasta — both are incredible.",url:"https://www.saltandlavender.com/honey-garlic-shrimp/",img:"https://images.unsplash.com/photo-1559847844-5315695dadae?w=800&q=80"},
+  {title:"Lamb Kofta with Tzatziki",cuisine:"Middle Eastern · Lamb",rating:"⭐⭐⭐⭐⭐ 4.8",desc:"Spiced ground lamb on skewers, grilled until charred outside and juicy within. Served with cool tzatziki and warm flatbread.",url:"https://www.recipetineats.com/kofta-kebabs/",img:"https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=800&q=80"},
+  {title:"Miso Ramen",cuisine:"Japanese · Pork",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"A rich miso-based broth with chashu pork belly, soft-boiled eggs, noodles, nori, and corn. Weekend worthy and deeply satisfying.",url:"https://www.seriouseats.com/miso-ramen-recipe",img:"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&q=80"},
+  {title:"Sheet Pan Sausage & Vegetables",cuisine:"American · Pork",rating:"⭐⭐⭐⭐⭐ 4.8",desc:"Italian sausage, bell peppers, zucchini, and onions roasted on one pan with herbs and olive oil. 10 minutes of prep, zero cleanup.",url:"https://www.wellplated.com/sheet-pan-sausage-and-vegetables/",img:"https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&q=80"},
+  {title:"Creamy Tuscan White Bean Soup",cuisine:"Italian · Vegetarian",rating:"⭐⭐⭐⭐⭐ 4.8",desc:"Cannellini beans simmered with sun-dried tomatoes, spinach, parmesan, and rosemary into a silky, hearty soup that tastes like it cooked all day.",url:"https://www.halfbakedharvest.com/tuscan-white-bean-soup/",img:"https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80"},
+  {title:"Smoked Brisket",cuisine:"BBQ · Beef",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"Low and slow over oak or hickory for 12+ hours until fall-apart tender with a thick peppery bark. The pinnacle of backyard cooking.",url:"https://www.seriouseats.com/texas-style-smoked-beef-brisket",img:"https://images.unsplash.com/photo-1544025162-d76538f10f30?w=800&q=80"},
+  {title:"Lobster Bisque",cuisine:"French · Seafood",rating:"⭐⭐⭐⭐⭐ 4.9",desc:"A rich, velvety bisque made from scratch with lobster shells, cream, cognac, and tarragon. Restaurant-quality in your own kitchen.",url:"https://www.spendwithpennies.com/lobster-bisque/",img:"https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=800&q=80"},
+  {title:"Peking-Style Duck Breast",cuisine:"Chinese · Duck",rating:"⭐⭐⭐⭐⭐ 4.8",desc:"Duck breast scored and roasted with a sweet hoisin glaze until the skin crisps like lacquer. Serve with mandarin pancakes and scallions.",url:"https://www.seriouseats.com/peking-duck-recipe",img:"https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&q=80"},
 ];
 
-let lastWildcard = -1;
+function renderSuggestions() {
+  const grid = document.getElementById('recipe-grid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = '1fr';
+
+  const header = document.createElement('div');
+  header.className = 'suggestions-header';
+  header.textContent = '5-star recipes from around the web — tap to view the full recipe';
+  grid.appendChild(header);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'suggestions-grid';
+
+  // Shuffle on each load
+  const shuffled = [...SUGGESTIONS].sort(() => Math.random() - 0.5);
+
+  shuffled.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'suggestion-card';
+    card.innerHTML = `
+      <img class="suggestion-img" src="${s.img}" alt="${s.title}" loading="lazy" onerror="this.style.display='none'">
+      <div class="suggestion-body">
+        <div class="suggestion-cuisine">${s.cuisine}</div>
+        <div class="suggestion-title">${s.title}</div>
+        <div class="suggestion-desc">${s.desc}</div>
+        <div class="suggestion-meta">
+          <span class="suggestion-rating">${s.rating}</span>
+          <a class="suggestion-link" href="${s.url}" target="_blank">View Recipe →</a>
+        </div>
+      </div>`;
+    wrap.appendChild(card);
+  });
+
+  grid.appendChild(wrap);
+}
 
 function enterMood() {
   selectedProtein = null;
@@ -1190,23 +1199,7 @@ function surpriseMe() {
   setTimeout(() => openDetail(r.id), 50);
 }
 
-function showWildcard() {
-  let idx;
-  do { idx = Math.floor(Math.random() * WILDCARDS.length); } while (idx === lastWildcard && WILDCARDS.length > 1);
-  lastWildcard = idx;
-  const w = WILDCARDS[idx];
-  document.getElementById('wc-tag').textContent = w.tag;
-  document.getElementById('wc-title').textContent = w.title;
-  document.getElementById('wc-source').textContent = '🔗 ' + w.url.replace('https://','').split('/')[0];
-  document.getElementById('wc-img').src = w.img;
-  document.getElementById('wc-desc').textContent = w.desc;
-  document.getElementById('wc-link').href = w.url;
-  document.getElementById('wildcard-modal').classList.remove('hidden');
-}
 
-function closeWildcard() {
-  document.getElementById('wildcard-modal').classList.add('hidden');
-}
 
 function enterCookbook() {
   show('home');
@@ -1219,6 +1212,8 @@ function setTab(tab, btn) {
   activeTab = tab;
   document.querySelectorAll('.tab-bar-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  // Reset grid columns if coming from suggestions
+  document.getElementById('recipe-grid').style.gridTemplateColumns = '';
   renderGrid();
 }
 
@@ -1230,8 +1225,10 @@ function renderGrid() {
 
   if (activeTab === 'favorites') {
     filtered = filtered.filter(r => r.cooks > 0).sort((a,b) => b.cooks - a.cooks);
-  } else if (activeTab === 'explore') {
-    filtered = filtered.filter(r => r.cooks === 0).sort(() => Math.random() - 0.5);
+  } else if (activeTab === 'suggestions') {
+    // Rendered separately
+    renderSuggestions();
+    return;
   } else {
     filtered = filtered.sort((a,b) => a.title.localeCompare(b.title));
   }
@@ -1241,7 +1238,6 @@ function renderGrid() {
   if (filtered.length === 0) {
     const msgs = {
       favorites: ['⭐', 'No favorites yet', 'Cook a recipe and tap the counter on the detail page to log it here.'],
-      explore:   ['🎉', "You've tried everything!", 'Incredible — there are no unexplored recipes left.'],
     };
     const [icon, title, sub] = msgs[activeTab] || ['🍴','Nothing here','Try a different tab.'];
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">${icon}</div><div class="es-title">${title}</div><div class="es-sub">${sub}</div></div>`;
