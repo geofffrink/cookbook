@@ -1389,10 +1389,11 @@ function switchView(view) {
   const fw = document.getElementById('filter-wrap');
   const grid = document.getElementById('recipe-grid');
 
+  const viewToId = {all:'hdr-all', favorites:'hdr-fav', suggestions:'hdr-sug'};
   ['hdr-all','hdr-fav','hdr-sug'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
-    const isActive = (id === 'hdr-' + view) || (id === 'hdr-all' && view === 'all');
+    const isActive = id === viewToId[view];
     el.style.background = isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)';
     el.style.color = isActive ? 'white' : 'rgba(255,255,255,0.6)';
   });
@@ -1468,6 +1469,7 @@ function openDetail(id) {
     ? `<div class="no-steps">🍴 Cooking steps coming soon — we'll add these as we build out the cookbook!</div>`
     : r.steps.map((s,i)=>`<div class="step-row"><div class="step-num">${i+1}</div><div><div class="step-label">${s.title}</div><div class="step-text">${s.text}</div>${s.img?`<img class="step-img" src="${s.img}" alt="${s.title}" loading="lazy">`:''}  </div></div>`).join('');
   switchTab('ingredients', document.querySelector('.tab-btn'));
+  updateStarBtn();
   show('detail');
   document.querySelector('#detail .detail-body').scrollTop = 0;
 }
