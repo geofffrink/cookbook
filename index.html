@@ -453,12 +453,13 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 
 /* ── STAR FAVORITE ── */
 .star-btn {
-  background:none; border:none; cursor:pointer;
-  font-size:26px; line-height:1; padding:2px 4px;
-  transition:transform 0.2s; flex-shrink:0;
-  -webkit-user-select:none;
+  background:rgba(255,255,255,0.12); border:none; cursor:pointer;
+  font-size:20px; line-height:1; padding:8px 10px;
+  border-radius:50px; transition:all 0.2s; flex-shrink:0;
+  -webkit-user-select:none; color:white;
 }
-.star-btn:active { transform:scale(1.3); }
+.star-btn:active { transform:scale(1.2); background:rgba(255,255,255,0.22); }
+.star-btn.starred { background:rgba(201,150,42,0.3); }
 </style>
 </head>
 <body>
@@ -1275,12 +1276,19 @@ function setStarred(id, val) {
 function updateStarBtn() {
   if (!current) return;
   const btn = document.getElementById('star-btn');
-  if (btn) btn.textContent = isStarred(current.id) ? '⭐' : '☆';
+  if (!btn) return;
+  const starred = isStarred(current.id);
+  btn.textContent = starred ? '⭐' : '☆';
+  btn.classList.toggle('starred', starred);
+  btn.title = starred ? 'Remove from Favorites' : 'Add to Favorites';
 }
 function toggleStar() {
   if (!current) return;
   setStarred(current.id, !isStarred(current.id));
   updateStarBtn();
+  // pulse
+  const btn = document.getElementById('star-btn');
+  if (btn) { btn.style.transform = 'scale(1.3)'; setTimeout(() => btn.style.transform = '', 200); }
 }
 
 function getCardBadge(n) { return ''; } // stub — no longer used for display
