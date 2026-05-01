@@ -1312,7 +1312,7 @@ function enterCollection(col) {
     bar.classList.toggle('visible', col !== 'all');
   }
   show('home');
-  switchView('all');
+  renderGrid();
 }
 
 // ── URL HASH ROUTING ─────────────────────────────────────────────────────────
@@ -1402,9 +1402,7 @@ function applyFilters() {
 }
 
 
-function buildHome() {
-  switchView('all');
-}
+function buildHome() { renderGrid(); }
 
 
 function renderGrid() { applyFilters(); }
@@ -1457,7 +1455,7 @@ function goHome() {
   const col = activeCollection || 'all';
   if (col !== 'all') {
     show('home');
-    switchView('all');
+    renderGrid();
   } else {
     showCollection();
   }
@@ -1465,7 +1463,7 @@ function goHome() {
 
 function goBackToMood() {
   show('home');
-  switchView('all');
+  renderGrid();
 }
 
 function showMoodResultsBar(label) {
