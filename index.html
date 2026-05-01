@@ -424,20 +424,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 }
 .fpill.active { background:var(--dark-brown); border-color:var(--dark-brown); color:white; }
 .fpill:active { transform:scale(0.95); }
-.filter-dropdowns { display:flex; gap:8px; }
-.fselect-wrap { flex:1; position:relative; }
-.fselect {
-  width:100%; padding:7px 28px 7px 10px; border-radius:8px;
-  border:1.5px solid var(--border); font-family:var(--font-body);
-  font-size:11px; font-weight:500; color:#7A7060; background:white;
-  cursor:pointer; appearance:none; -webkit-appearance:none;
-  outline:none; transition:border-color 0.15s;
-}
-.fselect.active { border-color:var(--rust); color:var(--rust); font-weight:600; }
-.fselect-arrow {
-  position:absolute; right:8px; top:50%; transform:translateY(-50%);
-  font-size:10px; color:#9A9080; pointer-events:none;
-}
+
 .filter-result-count {
   font-size:10px; color:#A09880; padding:0 2px 2px;
   letter-spacing:0.3px;
@@ -672,32 +659,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
   </div>
   <div class="filter-wrap" id="filter-wrap">
     <div class="filter-pills" id="filter-pills"></div>
-    <div class="filter-dropdowns">
-      <div class="fselect-wrap">
-        <select class="fselect" id="filter-difficulty" onchange="applyFilters()">
-          <option value="">Any Difficulty</option>
-          <option value="Easy">Easy</option>
-          <option value="Medium">Medium</option>
-          <option value="Hard">Hard</option>
-        </select>
-        <span class="fselect-arrow">▾</span>
-      </div>
-      <div class="fselect-wrap">
-        <select class="fselect" id="filter-time" onchange="applyFilters()">
-          <option value="">Any Time</option>
-          <option value="quick">Quick (≤ 30 min)</option>
-          <option value="standard">Standard (30–45 min)</option>
-          <option value="commitment">Commitment (45 min+)</option>
-        </select>
-        <span class="fselect-arrow">▾</span>
-      </div>
-      <div class="fselect-wrap">
-        <select class="fselect" id="filter-sort" onchange="applyFilters()">
-          <option value="az">A → Z</option>
-        </select>
-        <span class="fselect-arrow">▾</span>
-      </div>
-    </div>
+
     <div class="filter-result-count" id="filter-result-count"></div>
   </div>
   <!-- Tab bar kept for Favorites / Suggestions switching -->
@@ -1561,15 +1523,8 @@ function getMinutes(timeStr) {
 }
 
 function applyFilters() {
-  const diff = document.getElementById('filter-difficulty')?.value || '';
-  const time = document.getElementById('filter-time')?.value || '';
-  const sort = document.getElementById('filter-sort')?.value || 'az';
-
-  // Style selects
-  ['filter-difficulty','filter-time','filter-sort'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('active', el.value !== '' && id !== 'filter-sort');
-  });
+  const diff = '';
+  const time = '';
 
   let filtered = RECIPES.map(r => ({...r, cooks: 0}));
   // Filter by collection
@@ -1586,19 +1541,7 @@ function applyFilters() {
     }
   }
 
-  // Difficulty filter
-  if (diff) filtered = filtered.filter(r => r.difficulty === diff);
 
-  // Time filter
-  if (time) {
-    filtered = filtered.filter(r => {
-      const mins = getMinutes(r.time);
-      if (time === 'quick') return mins <= 30;
-      if (time === 'standard') return mins > 30 && mins <= 45;
-      if (time === 'commitment') return mins > 45;
-      return true;
-    });
-  }
 
   // Sort
   filtered = filtered.sort((a,b) => a.title.localeCompare(b.title));
