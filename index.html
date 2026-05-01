@@ -1373,11 +1373,9 @@ function applyFilters() {
   filtered = filtered.sort((a,b) => a.title.localeCompare(b.title));
 
   const countEl = document.getElementById('filter-result-count');
-  if (countEl) countEl.textContent = filtered.length === RECIPES.length
-    ? `${RECIPES.length} recipes`
-    : `${filtered.length} of ${RECIPES.length} recipes`;
+  if (countEl) countEl.textContent = filtered.length === RECIPES.length ? `${RECIPES.length} recipes` : `${filtered.length} of ${RECIPES.length} recipes`;
 
-  document.getElementById('recipe-count-label').textContent = RECIPES.length + ' recipes';
+  const rcl = document.getElementById('recipe-count-label'); if (rcl) rcl.textContent = RECIPES.length + ' recipes';
 
   const grid = document.getElementById('recipe-grid');
   grid.style.gridTemplateColumns = '';
