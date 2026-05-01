@@ -30,7 +30,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 .home-header {
   background:var(--dark-brown); padding:14px 20px 12px;
   flex-shrink:0; position:relative; overflow:hidden;
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
 }
 .home-header > * { position:relative; z-index:1; }
 .home-header::before {
@@ -441,20 +441,10 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 .coll-all-btn:active { background:rgba(255,255,255,0.12); }
 
 /* ── COLLECTION BADGE on home ── */
-.coll-bar {
-  background:var(--dark-brown); padding:8px 14px;
-  display:none; align-items:center; justify-content:space-between;
-  flex-shrink:0;
-}
-.coll-bar.visible { display:flex; }
-.coll-bar-label {
-  font-size:12px; font-weight:600; color:rgba(255,255,255,0.8); letter-spacing:0.3px;
-}
-.coll-bar-back {
-  background:rgba(255,255,255,0.12); border:none; border-radius:50px;
-  color:white; font-family:var(--font-body); font-size:11px; font-weight:500;
-  padding:5px 12px; cursor:pointer;
-}
+
+
+
+
 
 /* ── SINGLE PAGE DETAIL ── */
 .detail-recipe-photo {
@@ -580,13 +570,17 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 <!-- HOME -->
 <div id="home" class="screen hidden">
   <div class="home-header">
-    <div class="eyebrow">A Personal Cookbook</div>
-    <h1 class="home-title">El Jefe's<br><em>Favorite Creations</em></h1>
+    <div>
+      <div class="eyebrow">A Personal Cookbook</div>
+      <h1 class="home-title">El Jefe's<br><em>Favorite Creations</em></h1>
+    </div>
+    <div id="coll-header-badge" style="display:none; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;">
+      <button onclick="showCollection()" style="background:rgba(255,255,255,0.12);border:none;border-radius:50px;color:rgba(255,255,255,0.75);font-family:var(--font-body);font-size:11px;font-weight:500;padding:5px 12px;cursor:pointer;">← Change</button>
+      <div id="coll-header-emoji" style="font-size:32px; line-height:1; text-align:right;"></div>
+      <div id="coll-header-name" style="font-family:var(--font-display); font-size:clamp(18px,2.5vw,26px); font-weight:900; color:white; line-height:1.1; text-align:right;"></div>
+    </div>
   </div>
-  <div class="coll-bar" id="coll-bar">
-    <span class="coll-bar-label" id="coll-bar-label"></span>
-    <button class="coll-bar-back" onclick="showCollection()">← Change</button>
-  </div>
+
   <div class="filter-wrap" id="filter-wrap">
 
     <div class="filter-result-count" id="filter-result-count"></div>
@@ -1270,12 +1264,19 @@ function showCollection() {
 
 function enterCollection(col) {
   activeCollection = col;
-  // Update collection bar
-  const bar = document.getElementById('coll-bar');
-  const lbl = document.getElementById('coll-bar-label');
-  if (bar && lbl) {
-    lbl.textContent = COLL_LABELS[col] || '';
-    bar.classList.toggle('visible', col !== 'all');
+  const badge = document.getElementById('coll-header-badge');
+  const emoji = document.getElementById('coll-header-emoji');
+  const name  = document.getElementById('coll-header-name');
+  const collEmojis = {hof:'🏆',everyday:'🍽️',mealprep:'📦',random:'🎲'};
+  const collNames  = {hof:'Hall of Fame',everyday:'Everyday Favorites',mealprep:'Meal Prep',random:'Random & Sides'};
+  if (badge) {
+    if (col !== 'all') {
+      badge.style.display = 'flex';
+      if (emoji) emoji.textContent = collEmojis[col] || '';
+      if (name)  name.textContent  = collNames[col]  || '';
+    } else {
+      badge.style.display = 'none';
+    }
   }
   show('home');
   renderGrid();
