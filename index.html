@@ -107,11 +107,6 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 .meta-cell:last-child { border-right:none; }
 .meta-val { display:block; font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--charcoal); }
 .meta-lbl { display:block; font-size:9px; letter-spacing:1.2px; text-transform:uppercase; color:#A0998A; margin-top:2px; }
-.detail-tabs { display:flex; background:white; border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; }
-.tab-btn { flex:1; padding:14px 8px; border:none; background:none; font-family:var(--font-body); font-size:13px; font-weight:500; color:#9A9080; cursor:pointer; border-bottom:2.5px solid transparent; transition:all 0.2s; }
-.tab-btn.active { color:var(--rust); border-bottom-color:var(--rust); }
-.tab-panel { display:none; padding:20px 20px 24px; }
-.tab-panel.active { display:block; }
 .ing-group-label { font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:#B0A898; padding:12px 0 6px; border-bottom:1px solid var(--border); margin-bottom:2px; }
 .ing-group-label:first-child { padding-top:0; }
 .ing-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #F0EAE0; }
@@ -441,18 +436,7 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
 .star-btn:active { transform:scale(1.2); background:rgba(255,255,255,0.22); }
 .star-btn.starred { background:rgba(201,150,42,0.3); }
 
-/* ── PHOTO TAB ── */
-.recipe-photo-wrap { padding:0; }
-.recipe-photo-full {
-  width:100%; height:calc(100vh - 280px); object-fit:contain;
-  display:block; background:#1A1208;
-}
-.recipe-photo-placeholder {
-  width:100%; height:260px; display:flex;
-  align-items:center; justify-content:center;
-  font-size:64px; background:#F0EAE0;
-  border-radius:0 0 18px 18px;
-}
+
 
 /* ── COLLECTION SCREEN ── */
 #collection {
@@ -536,6 +520,25 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
   color:white; font-family:var(--font-body); font-size:11px; font-weight:500;
   padding:5px 12px; cursor:pointer;
 }
+
+/* ── SINGLE PAGE DETAIL ── */
+.detail-recipe-photo {
+  width:100%; height:220px; object-fit:cover; display:block;
+  background:#1A1208; flex-shrink:0;
+}
+.detail-recipe-photo-placeholder {
+  width:100%; height:220px; display:flex; align-items:center;
+  justify-content:center; font-size:64px; background:#1A1208; flex-shrink:0;
+}
+.detail-section {
+  padding:18px 20px 0;
+}
+.detail-section-title {
+  font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
+  color:var(--rust); margin-bottom:12px; padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+}
+.detail-section-last { padding-bottom:24px; }
 </style>
 </head>
 <body>
@@ -686,14 +689,15 @@ body { font-family:var(--font-body); background:var(--cream); color:var(--charco
   </div>
   <div class="detail-body">
     <div class="meta-strip" id="d-meta"></div>
-    <div class="detail-tabs">
-      <button class="tab-btn active" onclick="switchTab('photo',this)">📸 Photo</button>
-      <button class="tab-btn" onclick="switchTab('ingredients',this)">Ingredients</button>
-      <button class="tab-btn" onclick="switchTab('steps',this)">Directions</button>
+    <div id="detail-photo-wrap"></div>
+    <div class="detail-section">
+      <div class="detail-section-title">Ingredients</div>
+      <div id="tab-ingredients"></div>
     </div>
-    <div id="tab-photo" class="tab-panel active"></div>
-    <div id="tab-ingredients" class="tab-panel"></div>
-    <div id="tab-steps" class="tab-panel"></div>
+    <div class="detail-section detail-section-last">
+      <div class="detail-section-title">Directions</div>
+      <div id="tab-steps"></div>
+    </div>
   </div>
   <div class="cook-cta">
     <button class="start-btn" onclick="startCooking()">🍳 &nbsp;Start Cooking</button>
@@ -1659,49 +1663,19 @@ function openDetail(id) {
   stepsEl.innerHTML = (!r.steps||!r.steps.length)
     ? `<div class="no-steps">🍴 Cooking steps coming soon — we'll add these as we build out the cookbook!</div>`
     : r.steps.map((s,i)=>`<div class="step-row"><div class="step-num">${i+1}</div><div><div class="step-label">${s.title}</div><div class="step-text">${s.text}</div>${s.img?`<img class="step-img" src="${s.img}" alt="${s.title}" loading="lazy">`:''}  </div></div>`).join('');
-  const photoEl = document.getElementById('tab-photo');
+  const photoWrap = document.getElementById('detail-photo-wrap');
   const catEmoji = {'Steak':'🥩','Chicken':'🍗','Pork':'🐷','Seafood':'🦐','Turkey':'🦃','Vegetarian':'🥗','Pasta':'🍝','Sides':'🥣','Ground Beef':'🍔','Grill':'🌭'}[r.category]||'🍴';
-  photoEl.innerHTML = r.image
-    ? `<div class="recipe-photo-wrap"><img class="recipe-photo-full" src="${r.image}" alt="${r.title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="recipe-photo-placeholder" style="display:none">${catEmoji}</div></div>`
-    : `<div class="recipe-photo-placeholder">${catEmoji}</div>`;
-  switchTab('photo', document.querySelector('.tab-btn'));
+  photoWrap.innerHTML = r.image
+    ? `<img class="detail-recipe-photo" src="${r.image}" alt="${r.title}" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<div class=\'detail-recipe-photo-placeholder\'>${catEmoji}</div>')">`
+    : `<div class="detail-recipe-photo-placeholder">${catEmoji}</div>`;
   updateStarBtn();
   updateHash(current.id);
   show('detail');
   document.querySelector('#detail .detail-body').scrollTop = 0;
 }
 
-function getNoteKey(id) { return 'note_' + id; }
-function getNoteTs(id) { return 'note_ts_' + id; }
 
-function loadNotes() {
-  if (!current) return;
-  const saved = localStorage.getItem(getNoteKey(current.id)) || '';
-  const ts = localStorage.getItem(getNoteTs(current.id));
-  const input = document.getElementById('notes-input');
-  const savedEl = document.getElementById('notes-saved');
-  input.value = saved;
-  savedEl.textContent = ts ? 'Last edited ' + ts : '';
 
-  input.oninput = () => {
-    localStorage.setItem(getNoteKey(current.id), input.value);
-    const now = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'});
-    localStorage.setItem(getNoteTs(current.id), now);
-    savedEl.textContent = 'Saved just now';
-    savedEl.style.opacity = '1';
-    setTimeout(() => { savedEl.style.opacity = '0.6'; }, 2000);
-  };
-}
-
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  const btns = document.querySelectorAll('.tab-btn');
-  if (name === 'photo')        btns[0].classList.add('active');
-  else if (name === 'ingredients') btns[1].classList.add('active');
-  else if (name === 'steps')   btns[2].classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-}
 
 
 
